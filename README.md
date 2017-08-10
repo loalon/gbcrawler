@@ -17,13 +17,15 @@ GBobject = GBcrawler("tth1.gb")
 The following data can be adquired using:
 
 attribute references:
-	sequenceID returns sequence identification
-	sequenceLength returns length of sequence
-	strand 
-	
-	
+  * sequenceID 
+    returns sequence identification
+  * sequenceLength 
+    returns length of sequence
+  * strand 
+
 Methods:
 
-  * getSequence() returns sequence as a string
+  * getSequence() 
+    returns sequence as a string
 
 
