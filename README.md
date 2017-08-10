@@ -10,9 +10,9 @@ Generates a Python object of GBcrawler class that stores all relevant informatio
 
 Creating an object with the GenBank filename as a parameter
 
-'''
+```
 GBobject = GBcrawler("tth1.gb")
-'''
+```
 
 The following data can be adquired using:
 
