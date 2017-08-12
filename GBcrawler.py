@@ -1,3 +1,4 @@
+#title           :GBcrawler.py
 import re
 
 """GBcrawler GenBank reader and parser"""
