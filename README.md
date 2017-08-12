@@ -15,7 +15,7 @@ Generates a Python object of GBcrawler class that stores all relevant informatio
 
 [**Discrepancies**](#discrep)
 
-[**Future features **](#future)
+[**Future features**](#future)
 
 ## Features
 
