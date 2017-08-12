@@ -148,10 +148,8 @@ class GBcrawler:
 		# order matters, most used search state should be first,features then sequence
 			if searchState == "FEATURES":
 				if not line.startswith("                     "): #22
-					#print(line)
 					if tempFeature is not None:
 						self.featureList.append(tempFeature) #store previous
-					
 					featType=re.findall("(\S+)\s+" , line)
 					if featType[0] not in keyNames:
 						print (featType[0]+" is not a valid type. Check line "+ str(lineCounter))
@@ -164,9 +162,8 @@ class GBcrawler:
 						tempFeature.qualifierDict[tempQualifierKey]=tempQualifierValue
 					qualifierType=re.findall("/(\S+)=(\S+)" , line)
 					tempQualifierKey="pseudo"
-					tempQualifierValue=""		
+					tempQualifierValue=""
 				elif line.startswith("                     /"): 
-					#print(line)
 					if tempQualifierKey is not None:
 						tempFeature.qualifierDict[tempQualifierKey]=tempQualifierValue
 					qualifierType=re.findall("/(\S+)=(\S+)" , line)
@@ -203,9 +200,6 @@ class GBcrawler:
 			else:
 				continue
 
-	
-	#def __repr__(self):
-		#return ("Genbank file for ")
 	def __str__(self):
 		return ("Genbank file for "+self.sequenceID)
 		
