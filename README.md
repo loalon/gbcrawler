@@ -11,7 +11,7 @@ Generates a Python object of GBcrawler class that stores all relevant informatio
 [**Installation**](#installation)
 [**Usage**](#usage)
 [**Discrepancies**](#discrep)
-[**Future features*](#future)
+[**Future features**](#future)
 
 ## Features
 
@@ -45,13 +45,13 @@ Attribute references:
   * `moleculeType` returns molecule type
   * `division` returns divison code
   * `modDate` returns date
-  * `definition` returns
+  * `definition` returns definition
   * `accession` returns accesion
   * `version` returns version
   * `referenceList` returns
-  * `comment` returns
-  * `featureList` returns
-  * `sequenceList` returns  
+  * `comment` returns all the comments as a string
+  * `featureList` returns a list of GBfeatues object
+  * `sequenceList` returns the sequence as a list, (see methods to get the sequence as a string)
   * `baseCount` returns dictionary with nucleotide counts
 
 Methods:
