@@ -15,11 +15,11 @@ Generates a Python object of GBcrawler class that stores all relevant informatio
 
 [**Discrepancies**](#discrep)
 
-[**Future**](#future)
+[**Future features **](#future)
 
 ## Features
 
-This script was made using the information from 
+This script was made using the information from: 
 
   * NCBI-GenBank Flat File Release available at [NCBI](https://www.ncbi.nlm.nih.gov/genbank/)
   * Features table available at [INSDC](http://www.insdc.org/documents/feature-table).
@@ -27,20 +27,21 @@ This script was made using the information from
 
 ## Installation
 
-Python 3 is requiered
-Copy GBcrawler.py to folder you desire and proper import as explained [**Usage**](#usage)
+Python 3 is requiered.
+
+Copy GBcrawler.py to the folder of your project and import it as explained in [**Usage**](#usage)
 
 
 ## Usage
 
-Creating an object with the GenBank filename as a parameter
+To get the GenBank data, create an object with the GenBank filename as a parameter: 
 
 ```
 import GBcrawler from GB crawler
 GBobject = GBcrawler("tth1.gb")
 ```
 
-The following data can be adquired using:
+The following data can be adquired using: attributes or methods
 
 Attribute references:
   * `sequenceID` returns sequence identification
@@ -72,10 +73,10 @@ The featureList is composed of GBfeature objects and data can be adquired using 
 The last Flat File release 220.0 has a set of features that is different from the feature table in INSDC. The release indicates "Any discrepancy between the abbreviated feature table description of these release notes and the complete documentation on the Web
 should be resolved in favor of the version at the above URL."
 
-At this moment until a large batch of GenBank files can be tested, both sets of features will be used.
+At the moment, both sets of features will be used to parse the GenBank files, until a large batch of GenBank files can be tested and check how many files uses the "non-standard" features
 
 
-## Future
+## Future features
 
   * export to FASTA
   * check features for mandatory qualifiers
@@ -83,6 +84,6 @@ At this moment until a large batch of GenBank files can be tested, both sets of 
   * tag features by its locus_tag
   * use additional info for the features (beyond, between bases, etc)
   * create a Reference class to better reference data management
-  * improve accesion to return a list
+  * improve ACCESION to return a list
   * improve SOURCE parsing 
 
