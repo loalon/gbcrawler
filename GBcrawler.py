@@ -12,13 +12,14 @@ class GBfeature:
 	betweenBases=False
 	qualifierDict={}
 	pseudo=False
-	
+
 	def __init__(self, begin, end, type):
 		self.begin = begin
 		self.end = end
 		self.type = type
+
 	def __repr__(self):
-		return ("Type: "+self.name + "; Start: "+self.begin+"; End: " +self.end)
+		return ("Type: "+self.type + "; Start: "+self.begin+"; End: " +self.end)
 
 ''' For future uses
 class GBreference:
