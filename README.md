@@ -8,10 +8,14 @@ Generates a Python object of GBcrawler class that stores all relevant informatio
 ## Table of Contents
 
 [**Features**](#features)
+
 [**Installation**](#installation)
+
 [**Usage**](#usage)
+
 [**Discrepancies**](#discrep)
-[**Future features**](#future)
+
+[**Future**](#future)
 
 ## Features
 
@@ -48,11 +52,11 @@ Attribute references:
   * `definition` returns definition
   * `accession` returns accesion
   * `version` returns version
-  * `referenceList` returns
+  * `referenceList` returns a list, each element is a reference
   * `comment` returns all the comments as a string
   * `featureList` returns a list of GBfeatues object
-  * `sequenceList` returns the sequence as a list, (see methods to get the sequence as a string)
-  * `baseCount` returns dictionary with nucleotide counts
+  * `sequenceList` returns the sequence as a list, (see methods to get the sequence as a string)
+  * `baseCount` returns dictionary with nucleotide counts
 
 Methods:
   * `getSequence()` returns sequence as a string
@@ -71,7 +75,7 @@ should be resolved in favor of the version at the above URL."
 At this moment until a large batch of GenBank files can be tested, both sets of features will be used.
 
 
-## Future features
+## Future
 
   * export to FASTA
   * check features for mandatory qualifiers
