@@ -174,6 +174,7 @@ class GBcrawler:
 				else: 
 					qt=re.findall("(\S+)" , line)
 					tempQualifierValue += qt[0]
+					
 			elif searchState == "ORIGIN":
 				for i in line:
 					if i.isalpha():
