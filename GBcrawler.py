@@ -4,20 +4,17 @@ import re
 """GBcrawler GenBank reader and parser"""
 
 class GBfeature:
-	begin=0
-	end=0
-	type=""
-	complementary=False
-	beginIsBeyond=False
-	endIsBeyond=False
-	betweenBases=False
-	qualifierDict={}
-	pseudo=False
 
 	def __init__(self, begin, end, type):
 		self.begin = begin
 		self.end = end
 		self.type = type
+		self.complementary=False
+		self.beginIsBeyond=False
+		self.endIsBeyond=False
+		self.betweenBases=False
+		self.qualifierDict={}
+		self.pseudo=False
 
 	def __repr__(self):
 		return ("Type: "+self.type + "; Start: "+self.begin+"; End: " +self.end)
@@ -35,24 +32,24 @@ class GBreference:
 '''
 
 class GBcrawler:
-	sequenceID=""
-	sequenceLength=0
-	strand=""	
-	moleculeType=""
-	division=""
-	modDate=""
-	definition=""
-	accession=""
-	version=""
-	keywords=[]
-	comment=""
-	referenceList=[]
-	featureList=[]  #stores feature objects
-	sequenceList=[]
-	baseCount = {'a': 0, 'c': 0, 'g': 0, 't': 0, 'n':0}
 	
 	
 	def __init__(self, filename):
+		self.sequenceID=""
+		self.sequenceLength=0
+		self.strand=""	
+		self.moleculeType=""
+		self.division=""
+		self.modDate=""
+		self.definition=""
+		self.accession=""
+		self.version=""
+		self.keywords=[]
+		self.comment=""
+		self.referenceList=[]
+		self.featureList=[]  #stores feature objects
+		self.baseCount = {'a': 0, 'c': 0, 'g': 0, 't': 0, 'n':0}
+		self.sequenceList=[]
 		self.filename = filename
 		input = open(filename, 'r')
 		searchState="" 
@@ -91,6 +88,7 @@ class GBcrawler:
 		]
 		
 		for line in input:
+			print(line)
 			lineCounter+=1
 			#1. check the line and change searchState if needed
 		
@@ -165,6 +163,12 @@ class GBcrawler:
 					qualifierType=re.findall("/(\S+)=(\S+)" , line)
 					tempQualifierKey="pseudo"
 					tempQualifierValue=""
+				elif line.startswith("                     /ribosomal_slippage"): 
+					if tempQualifierKey is not None:
+						tempFeature.qualifierDict[tempQualifierKey]=tempQualifierValue
+					qualifierType=re.findall("/(\S+)=(\S+)" , line)
+					tempQualifierKey="ribosomal_slippage"
+					tempQualifierValue=""
 				elif line.startswith("                     /"): 
 					if tempQualifierKey is not None:
 						tempFeature.qualifierDict[tempQualifierKey]=tempQualifierValue
@@ -202,6 +206,7 @@ class GBcrawler:
 				self.comment+=line.lstrip()
 			else:
 				continue
+		input.close()
 
 	def __str__(self):
 		return ("Genbank file for "+self.sequenceID)
