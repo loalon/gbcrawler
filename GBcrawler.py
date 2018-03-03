@@ -79,16 +79,18 @@ class GBcrawler:
 			"-","-10_signal","-35_signal","3'clip","5'clip",
 			
 			#exclusive from insdc.org
-			"assembly_gap","centromere","gap","J_segment","mobile_element","ncRNA","operon","oriT",
-			"propeptide","regulatory","telomere","tmRNA","V_segment"
+			"assembly_gap","centromere","gap","J_segment","mobile_element","ncRNA",
+			"operon","oriT","propeptide","regulatory","telomere","tmRNA","V_segment"
 		]
-		divisionTypes=[
-			"PRI","ROD","MAM","VRT","INV","PLN","BCT","VRL","PHG","SYN",
-			"UNA","EST","PAT","STS","GSS","HTG","HTC","ENV","CON","TSA","   "
-		]
+		divisionTypes=["PRI","ROD","MAM","VRT","INV","PLN","BCT","VRL","PHG","SYN",
+			"UNA","EST","PAT","STS","GSS","HTG","HTC","ENV","CON","TSA","   "]
+		
+		monoQualifiers = ['environmental_sample','focus','germline','macronuclear',
+		'partial','proviral','pseudo','rearranged','ribosomal_slippage',
+		'transgenic','trans_splicing']
 		
 		for line in input:
-			print(line)
+			#print(line)
 			lineCounter+=1
 			#1. check the line and change searchState if needed
 		
@@ -147,9 +149,13 @@ class GBcrawler:
 		# 2nd according to the search state, decide action
 		# order matters, most used search state should be first,features then sequence
 			if searchState == "FEATURES":
+				#print(line)
 				if not line.startswith("                     "): #22
 					if tempFeature is not None:
+						tempFeature.qualifierDict[tempQualifierKey]=tempQualifierValue
 						self.featureList.append(tempFeature) #store previous
+						#print (tempQualifierKey)
+						#print (tempQualifierValue)
 					featType=re.findall("(\S+)\s+" , line)
 					if featType[0] not in keyNames:
 						print (featType[0]+" is not a valid type. Check line "+ str(lineCounter))
@@ -157,25 +163,23 @@ class GBcrawler:
 					tempFeature=GBfeature(positions[0],positions[1], featType[0])
 					if "complement" in line:
 						tempFeature.complementary=True
-				elif line.startswith("                     /pseudo"): 
-					if tempQualifierKey is not None:
-						tempFeature.qualifierDict[tempQualifierKey]=tempQualifierValue
-					qualifierType=re.findall("/(\S+)=(\S+)" , line)
-					tempQualifierKey="pseudo"
-					tempQualifierValue=""
-				elif line.startswith("                     /ribosomal_slippage"): 
-					if tempQualifierKey is not None:
-						tempFeature.qualifierDict[tempQualifierKey]=tempQualifierValue
-					qualifierType=re.findall("/(\S+)=(\S+)" , line)
-					tempQualifierKey="ribosomal_slippage"
-					tempQualifierValue=""
+
 				elif line.startswith("                     /"): 
+					#tempQualifierValue=""
 					if tempQualifierKey is not None:
 						tempFeature.qualifierDict[tempQualifierKey]=tempQualifierValue
-					qualifierType=re.findall("/(\S+)=(\S+)" , line)
-					tempQualifierKey=qualifierType[0][0]
-					tempQualifierValue=qualifierType[0][1]
-				else: 
+					qualifierType=re.findall("/(.+)" , line)
+					if qualifierType[0] in monoQualifiers:
+						print(qualifierType[0]) #TODO
+						tempQualifierKey=qualifierType[0]
+						tempQualifierValue=True
+					#elif line.startswith("                     /"):
+					else:
+						qualifierType=re.findall("/(\S+)=(.+)" , line)
+						#qualifierType=re.findall("/(\S+)=(\S+)" , line)
+						tempQualifierKey=qualifierType[0][0]
+						tempQualifierValue=qualifierType[0][1]
+				else: #manage multiline values
 					qt=re.findall("(\S+)" , line)
 					tempQualifierValue += qt[0]
 					

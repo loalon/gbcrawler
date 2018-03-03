@@ -28,7 +28,7 @@ contador=0
 
 for i in geneInfo.featureList:
 	if i.type == 'gene':
-		#print(i.qualifierDict.get('locus_tag'))
+		print(i.qualifierDict.get('locus_tag'))
 		contador+=1
 print (len(geneInfo.featureList))
 print(contador)
