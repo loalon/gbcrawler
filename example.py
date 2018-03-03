@@ -1,6 +1,6 @@
 from GBcrawler import GBcrawler
 
-geneInfo = GBcrawler("1.gb")
+geneInfo = GBcrawler("Pd1.gb")
 print("------LOADING EXAMPLE------")
 print ("file name:" + geneInfo.filename + "\n")
 print ("sequence: " + geneInfo.sequenceID)
@@ -28,10 +28,12 @@ contador=0
 
 for i in geneInfo.featureList:
 	if i.type == 'gene':
-		print(i.qualifierDict.get('locus_tag'))
+		#print(i.qualifierDict.get('locus_tag'))
 		contador+=1
 print (len(geneInfo.featureList))
 print(contador)
+
+geneInfo.saveAsFasta("testfa.fa")
 
 #print (geneInfo.featureList[0].name)
 #print (geneInfo.featureList[0].begin)

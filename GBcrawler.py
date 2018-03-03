@@ -108,6 +108,7 @@ class GBcrawler:
 					exit()
 				self.modDate=line[68:79].strip()
 			elif line.startswith("DEFINITION"):
+				searchState="DEFINITION"
 				self.definition=line[12:].strip()
 			elif line.startswith("ACCESSION"):
 				self.accession=line[12:].strip()
@@ -208,6 +209,9 @@ class GBcrawler:
 				self.keywords+=data3
 			elif searchState == "COMMENT":
 				self.comment+=line.lstrip()
+			elif searchState == "DEFINITION":
+				if line.startswith("            "):
+					self.definition+=" "+line.lstrip()
 			else:
 				continue
 		input.close()
@@ -217,4 +221,20 @@ class GBcrawler:
 		
 	def getSequence(self):
 		return (''.join(self.sequenceList))
+	def saveAsFasta(self, filename):
+		outFile = open(filename, 'w')
+		outFile.write('>')
+		outFile.write('\n')
+		nCounter=0
+		
+		for n in self.sequenceList:
+			outFile.write(str(n))
+			nCounter+=1
+			if nCounter==70:
+				outFile.write('\n')
+				nCounter=0
+			
+		#outFile.write()
+		outFile.close()
+		#70 nucleotides per line
 
