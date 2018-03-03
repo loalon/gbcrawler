@@ -19,17 +19,64 @@ class GBfeature:
 	def __repr__(self):
 		return ("Type: "+self.type + "; Start: "+self.begin+"; End: " +self.end)
 
-''' For future uses
+
 class GBreference:
-	referenceID=0
-	authors=[]
-	consortiums=[]
-	title=[]
-	journal="" #mandatory journal name, volume, year and page numbers
-	 medline="" obsolete
-	pubmed=""
-	remark=[]
-'''
+	def __init__(self, refString):
+	
+		#referenceID=0
+		self.authors=""
+		self.consortium=""
+		self.title=""
+		self.journal="" #mandatory journal name, volume, year and page numbers
+		#medline="" obsolete
+		self.pubmed=""
+		self.remark=""
+		lines=refString.split('\n')
+		self.reference=lines[0]
+		searchState=""
+		for line in lines:
+			print(line)
+			if line.startswith("  AUTHORS"):
+				searchState="AUTHORS"
+				self.authors+=line[12:]
+			elif line.startswith("  CONSRTM"):
+				searchState="CONSRTM"
+				self.consortium+=line[12:]
+			elif line.startswith("  TITLE"):
+				searchState="TITLE"
+				self.title+=line[12:]
+			elif line.startswith("  JOURNAL"):
+				searchState="JOURNAL"
+				self.journal+=line[12:]
+			elif line.startswith("  PUBMED"):
+				searchState="PUBMED"
+				self.pubmed+=line[12:]
+			elif line.startswith("  REMARK"):
+				searchState="REMARK"
+				self.remark+=line[12:]
+			elif line.startswith("  MEDLINE"):
+				searchState="MEDLINE"
+				print("MEDLINE was removed")
+			elif line.startswith("            "):
+				if searchState=="AUTHORS":
+					self.authors+=line[12:]
+				elif searchState=="CONSRTM":
+					self.consortium+=line[12:]
+				elif searchState=="TITLE":
+					self.title+=line[12:]
+				elif searchState=="JOURNAL":
+					self.journal+=line[12:]
+				elif searchState=="PUBMED":
+					self.pubmed+=line[12:]
+				elif searchState=="REMARK":
+					self.remark+=line[12:]
+				else:
+					continue
+		#TODO posprocessing each reference string to a list, dict or somethign
+		#p.e. separate authors,journals, etc
+
+	def __repr__(self):
+		return ("Type: ")
 
 class GBcrawler:
 	
@@ -125,12 +172,13 @@ class GBcrawler:
 			elif line.startswith("REFERENCE"):
 				searchState="REFERENCE"
 				if tempReference:
-					self.referenceList.append(tempReference)
+					#self.referenceList.append(tempReference)
+					self.referenceList.append(GBreference(tempReference))
 					tempReference=""
 				tempReference+=line[12:]
 				continue
 			elif line.startswith("COMMENT"):
-				self.referenceList.append(tempReference)
+				self.referenceList.append(GBreference(tempReference))
 				searchState="COMMENT"
 				self.comment+=line[12:]
 				continue
@@ -221,6 +269,7 @@ class GBcrawler:
 		
 	def getSequence(self):
 		return (''.join(self.sequenceList))
+		
 	def saveAsFasta(self, filename):
 		outFile = open(filename, 'w')
 		outFile.write('>')
