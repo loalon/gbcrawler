@@ -4,8 +4,9 @@ import re
 """GBcrawler GenBank reader and parser"""
 
 class GBfeature:
-
+	
 	def __init__(self, begin, end, type):
+
 		self.begin = begin
 		self.end = end
 		self.type = type
@@ -81,6 +82,7 @@ class GBreference:
 class GBcrawler:
 	
 	
+	
 	def __init__(self, filename):
 		self.sequenceID=""
 		self.sequenceLength=0
@@ -150,7 +152,7 @@ class GBcrawler:
 				self.division=line[64:67]
 				if self.division not in divisionTypes:
 					print ("Division type: "+self.division+" is not valid. Valid division are: ")
-					print(*divisionTypes, sep='\t')
+					#print (*divisionTypes, sep='\t')
 					print ("Exit program")
 					exit()
 				self.modDate=line[68:79].strip()
@@ -205,7 +207,7 @@ class GBcrawler:
 						self.featureList.append(tempFeature) #store previous
 						#print (tempQualifierKey)
 						#print (tempQualifierValue)
-					featType=re.findall("(\S+)\s+" , line)
+					featType=re.findall(r"(\S+)\s+" , line)
 					if featType[0] not in keyNames:
 						print (featType[0]+" is not a valid type. Check line "+ str(lineCounter))
 					positions=re.findall("([0-9]+)" , line)
@@ -224,12 +226,12 @@ class GBcrawler:
 						tempQualifierValue=True
 					#elif line.startswith("                     /"):
 					else:
-						qualifierType=re.findall("/(\S+)=(.+)" , line)
+						qualifierType=re.findall(r"/(\S+)=(.+)" , line)
 						#qualifierType=re.findall("/(\S+)=(\S+)" , line)
 						tempQualifierKey=qualifierType[0][0]
 						tempQualifierValue=qualifierType[0][1]
 				else: #manage multiline values
-					qt=re.findall("(\S+)" , line)
+					qt=re.findall(r"(\S+)" , line)
 					tempQualifierValue += qt[0]
 					
 			elif searchState == "ORIGIN":

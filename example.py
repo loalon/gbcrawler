@@ -1,6 +1,8 @@
 from GBcrawler import GBcrawler
 
-geneInfo = GBcrawler("1.gb")
+import sys,os
+
+geneInfo = GBcrawler(sys.argv[1])
 print("------LOADING EXAMPLE------")
 print ("file name:" + geneInfo.filename + "\n")
 print ("sequence: " + geneInfo.sequenceID)
