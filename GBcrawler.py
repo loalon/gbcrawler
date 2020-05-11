@@ -1,5 +1,6 @@
 #title           :GBcrawler.py
 import re
+import collections
 
 """GBcrawler GenBank reader and parser"""
 
@@ -80,13 +81,11 @@ class GBreference:
 		return ("Type: ")
 
 class GBcrawler:
-	
-	
-	
+
 	def __init__(self, filename):
 		self.sequenceID=""
 		self.sequenceLength=0
-		self.strand=""	
+		self.strand=""
 		self.moleculeType=""
 		self.division=""
 		self.modDate=""
@@ -97,16 +96,15 @@ class GBcrawler:
 		self.comment=""
 		self.referenceList=[]
 		self.featureList=[]  #stores feature objects
-		self.baseCount = {'a': 0, 'c': 0, 'g': 0, 't': 0, 'n':0}
+		#self.baseCount = {'a': 0, 'c': 0, 'g': 0, 't': 0, 'n':0}
+		self.baseCount = collections.Counter()
 		self.sequenceList=[]
 		self.filename = filename
-		input = open(filename, 'r')
-		searchState="" 
-		tempFeature=None
-		tempQualifierKey=""
-		tempQualifierValue=None
-		tempReference=""
-		lineCounter=0
+		
+		
+		#input = open(filename, 'r')
+		
+
 		keyNames=[
 			#both sets
 			"C_region","CDS","D-loop","D_segment","exon","gene","iDNA",
@@ -138,136 +136,161 @@ class GBcrawler:
 		'partial','proviral','pseudo','rearranged','ribosomal_slippage',
 		'transgenic','trans_splicing']
 		
-		for line in input:
-			#print(line)
-			lineCounter+=1
-			#1. check the line and change searchState if needed
+		searchState="LOCUS" #initial state
+		tempFeature=None
+		tempQualifierKey=""
+		tempQualifierValue=None
+		tempReference=""
+		lineCounter = 0
 		
-			if line.startswith("LOCUS"):
-			#LOCUS       NC_005835            1894877 bp    DNA     circular     12-SEP-2016
-				self.sequenceID=line[12:28].strip()
-				self.sequenceLength=line[29:40].strip()
-				self.strand=line[44:47].strip()
-				self.moleculeType=line[47:53].strip()
-				self.division=line[64:67]
-				if self.division not in divisionTypes:
-					print ("Division type: "+self.division+" is not valid. Valid division are: ")
-					#print (*divisionTypes, sep='\t')
-					print ("Exit program")
-					exit()
-				self.modDate=line[68:79].strip()
-			elif line.startswith("DEFINITION"):
-				searchState="DEFINITION"
-				self.definition=line[12:].strip()
-			elif line.startswith("ACCESSION"):
-				self.accession=line[12:].strip()
-			elif line.startswith("VERSION"):
-				self.version=line[12:].strip()			#DBlink ????
-			elif line.startswith("KEYWORDS"):	
-				searchState="KEYWORDS"
-				data3=re.findall("([^,]*)[,|\.|\s+]" , line[12:])
-				self.keywords+=data3
-				continue
-			elif line.startswith("SOURCE"):	
-				searchState="SOURCE"
-				continue
-			elif line.startswith("REFERENCE"):
-				searchState="REFERENCE"
-				if tempReference:
-					#self.referenceList.append(tempReference)
-					self.referenceList.append(GBreference(tempReference))
-					tempReference=""
-				tempReference+=line[12:]
-				continue
-			elif line.startswith("COMMENT"):
-				self.referenceList.append(GBreference(tempReference))
-				searchState="COMMENT"
-				self.comment+=line[12:]
-				continue
-			elif line.startswith("FEATURES"):
-				searchState="FEATURES"
-				continue
-			elif line.startswith("BASE COUNT"):
-				#OBSOLETE
-				searchState="OBSOLETE"
-				continue
-			elif line.startswith("ORIGIN"):
-				searchState="ORIGIN"
-				#need to append last feature
-				self.featureList.append(tempFeature)
-				continue
-
-		# 2nd according to the search state, decide action
-		# order matters, most used search state should be first,features then sequence
-			if searchState == "FEATURES":
-				#print(line)
-				if not line.startswith("                     "): #22
-					if tempFeature is not None:
-						tempFeature.qualifierDict[tempQualifierKey]=tempQualifierValue
-						self.featureList.append(tempFeature) #store previous
-						#print (tempQualifierKey)
-						#print (tempQualifierValue)
-					featType=re.findall(r"(\S+)\s+" , line)
-					if featType[0] not in keyNames:
-						print (featType[0]+" is not a valid type. Check line "+ str(lineCounter))
-					positions=re.findall("([0-9]+)" , line)
-					tempFeature=GBfeature(positions[0],positions[1], featType[0])
-					if "complement" in line:
-						tempFeature.complementary=True
-
-				elif line.startswith("                     /"): 
-					#tempQualifierValue=""
-					if tempQualifierKey is not None:
-						tempFeature.qualifierDict[tempQualifierKey]=tempQualifierValue
-					qualifierType=re.findall("/(.+)" , line)
-					if qualifierType[0] in monoQualifiers:
-						print(qualifierType[0]) #TODO
-						tempQualifierKey=qualifierType[0]
-						tempQualifierValue=True
-					#elif line.startswith("                     /"):
-					else:
-						qualifierType=re.findall(r"/(\S+)=(.+)" , line)
-						#qualifierType=re.findall("/(\S+)=(\S+)" , line)
-						tempQualifierKey=qualifierType[0][0]
-						tempQualifierValue=qualifierType[0][1]
-				else: #manage multiline values
-					qt=re.findall(r"(\S+)" , line)
-					tempQualifierValue += qt[0]
-					
-			elif searchState == "ORIGIN":
-				for i in line:
-					if i.isalpha():
-						self.sequenceList.append(i.upper())	
-					
-						if i == 'a':
-							self.baseCount['a'] += 1
-						elif i == 'c':
-							self.baseCount['c'] += 1
-						elif i == 'g':
-							self.baseCount['g'] += 1
-						elif i == 't':
-							self.baseCount['t'] += 1
-						else:
-							self.baseCount['n'] += 1
-			elif searchState=="REFERENCE":
-				if tempReference:
-					tempReference+=line
+		with open(filename, 'r') as f:
+			for line in f:
+				
+				lineCounter+=1
+				#1. check the line and change searchState if needed
+				# the most common situation is having a line starting with whitespaces
+				# in that case it should skip the checks and depend only on the seachState
+				if line.startswith(" "):
+					pass
+				elif line.startswith("LOCUS"):
+					pass
+				elif line.startswith("DEFINITION"):
+					searchState="DEFINITION"
+					self.definition=line[12:].strip()
+				elif line.startswith("ACCESSION"):
+					self.accession=line[12:].strip()
+				elif line.startswith("VERSION"):
+					self.version=line[12:].strip()			#DBlink ????
+				elif line.startswith("KEYWORDS"):	
+					searchState="KEYWORDS"
+					data3=re.findall("([^,]*)[,|\.|\s+]" , line[12:])
+					self.keywords+=data3
 					continue
-			elif searchState == "KEYWORDS":
-				data3=re.findall("([^,]*)[,|\.]" , line.lstrip())
-				#[([^,]*)\.|\s+]
-				self.keywords+=data3
-			elif searchState == "COMMENT":
-				self.comment+=line.lstrip()
-			elif searchState == "DEFINITION":
-				if line.startswith("            "):
-					self.definition+=" "+line.lstrip()
-			else:
-				continue
-		input.close()
+				elif line.startswith("SOURCE"):	
+					searchState="SOURCE"
+					continue
+				elif line.startswith("REFERENCE"):
+					searchState="REFERENCE"
+					if tempReference:
+						#self.referenceList.append(tempReference)
+						self.referenceList.append(GBreference(tempReference))
+						tempReference=""
+					tempReference+=line[12:]
+					continue
+				elif line.startswith("COMMENT"):
+					self.referenceList.append(GBreference(tempReference))
+					searchState="COMMENT"
+					self.comment+=line[12:]
+					continue
+				elif line.startswith("FEATURES"):
+					searchState="FEATURES"
+					continue
+				elif line.startswith("BASE COUNT"):
+					#OBSOLETE
+					searchState="OBSOLETE"
+					continue
+				elif line.startswith("ORIGIN"):
+					searchState="ORIGIN"
+					#need to append last feature
+					self.featureList.append(tempFeature)
+					continue
+					
+				#print(searchState)
+			# 2nd according to the search state, decide action
+			# order matters, most used search state should be first,features then sequence
+				if searchState == "FEATURES":
+					#print(line)
+					if not line.startswith("                     "): #22
+						if tempFeature is not None:
+							tempFeature.qualifierDict[tempQualifierKey]=tempQualifierValue
+							self.featureList.append(tempFeature) #store previous
+							#print (tempQualifierKey)
+							#print (tempQualifierValue)
+						featType=re.findall(r"(\S+)\s+" , line)
+						if featType[0] not in keyNames:
+							print (featType[0]+" is not a valid type. Check line "+ str(lineCounter))
+						positions=re.findall("([0-9]+)" , line)
+						tempFeature=GBfeature(positions[0],positions[1], featType[0])
+						if "complement" in line:
+							tempFeature.complementary=True
 
+					elif line.startswith("                     /"): 
+						#tempQualifierValue=""
+						#simplify with default dict value
+						if tempQualifierKey is not None:
+							tempFeature.qualifierDict[tempQualifierKey]=tempQualifierValue
+						qualifierType=re.findall("/(.+)" , line)
+						if qualifierType[0] in monoQualifiers:
+							print(qualifierType[0]) #TODO
+							# again simply with default dict value = true
+							tempQualifierKey=qualifierType[0]
+							tempQualifierValue=True
+						#elif line.startswith("                     /"):
+						else:
+							qualifierType=re.findall(r"/(\S+)=(.+)" , line)
+							#qualifierType=re.findall("/(\S+)=(\S+)" , line)
+							tempQualifierKey=qualifierType[0][0]
+							tempQualifierValue=qualifierType[0][1]
+					
+					else: #manage multiline values
+						qt=re.findall(r"(\S+)" , line)
+						tempQualifierValue += qt[0]
+						
+						
+				elif searchState == "ORIGIN":
+					for i in line:
+						if i.isalpha():
+							self.sequenceList.append(i.upper())	
+						"""
+							if i == 'a':
+								self.baseCount['a'] += 1
+							elif i == 'c':
+								self.baseCount['c'] += 1
+							elif i == 'g':
+								self.baseCount['g'] += 1
+							elif i == 't':
+								self.baseCount['t'] += 1
+							else:
+								self.baseCount['n'] += 1
+						"""
+				elif searchState=="REFERENCE":
+					if tempReference:
+						tempReference+=line
+						continue
+				elif searchState == "KEYWORDS":
+					data3=re.findall("([^,]*)[,|\.]" , line.lstrip())
+					#[([^,]*)\.|\s+]
+					self.keywords+=data3
+				elif searchState == "COMMENT":
+					self.comment+=line.lstrip()
+				elif searchState == "DEFINITION":
+					if line.startswith("            "):
+						self.definition+=" "+line.lstrip()
+				elif searchState == "LOCUS":
+					print("elif")
+					print(searchState)
+					print(line)
+					self.sequenceID = line[12:28].strip()
+					self.sequenceLength = line[29:40].strip()
+					self.strand = line[44:47].strip()
+					self.moleculeType = line[47:53].strip()
+					self.division = line[64:67]
+					if self.division not in divisionTypes:
+						print ("Division type: "+self.division+" is not valid. Valid divisions are: ")
+						#print (*divisionTypes, sep='\t')
+						print ("Exit program")
+						exit()
+					self.modDate=line[68:79].strip()
+				else:
+					continue
+		#input.close()
+		
+		# update the baseCount
+		self.baseCount.update(''.join(self.sequenceList))
+		
+		#self.baseCount.update(self.sequenceList)
 	def __str__(self):
-		return ("Genbank file for "+self.sequenceID)
+		return ("Genbank file for " + self.sequenceID)
 		
 	def getSequence(self):
 		return (''.join(self.sequenceList))

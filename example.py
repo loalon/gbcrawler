@@ -1,6 +1,8 @@
-from GBcrawler import GBcrawler
+from gbcrawler import GBcrawler
 
-import sys,os
+import sys,os,time
+
+start = time.time()
 
 geneInfo = GBcrawler(sys.argv[1])
 print("------LOADING EXAMPLE------")
@@ -44,3 +46,7 @@ print (geneInfo.referenceList)
 
 for i in geneInfo.referenceList:
 	print (i.authors)
+	
+print("time elapsed")
+end = time.time()
+print(end - start)
