@@ -3,3 +3,7 @@ __pycache__
 
 temp/
 venv/
+old/
+build/
+dist/
+example_gbcrawler_loalon.egg-info/
