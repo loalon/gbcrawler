@@ -267,9 +267,6 @@ class GBcrawler:
 					if line.startswith("            "):
 						self.definition+=" "+line.lstrip()
 				elif searchState == "LOCUS":
-					print("elif")
-					print(searchState)
-					print(line)
 					self.sequenceID = line[12:28].strip()
 					self.sequenceLength = line[29:40].strip()
 					self.strand = line[44:47].strip()

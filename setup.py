@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="example-gbcrawler-loalon",
-    version="0.2.1",
+    version="0.3.0",
     author="Alonso Serrano",
     author_email="bioinformatics@loalon.com",
     description="Complete GenBank parser",
